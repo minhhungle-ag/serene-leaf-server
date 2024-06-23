@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "serene-leaf-server",
   "builds": [
     {
       "src": "./index.js",
