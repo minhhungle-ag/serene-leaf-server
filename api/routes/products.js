@@ -5,7 +5,10 @@ router.get('/', (req, res) => {
   const { page, limit, searchKey } = req.query
 
   const filters = {}
-  filters.$or = [{ title: { $regex: searchKey, $options: 'i' } }]
+
+  if (searchKey) {
+    filters.$or = [{ title: { $regex: searchKey, $options: 'i' } }]
+  }
 
   const currentPage = page || 1
   const currentLimit = limit || 10
