@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/posts', require('./api/routes/post'))
-app.use('api/products', require('./api/routes/products'))
+app.use('/api/products', require('./api/routes/products'))
 app.use('/api/upload', require('./api/routes/upload'))
 
 app.use((req, res, next) => {
