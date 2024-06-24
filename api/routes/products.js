@@ -24,10 +24,12 @@ router.get('/', (req, res) => {
       res.status(200).json({
         data: {
           data,
-          page: currentPage,
-          limit: currentLimit,
-          total,
-          totalPage,
+          pagination: {
+            page: currentPage,
+            limit: currentLimit,
+            total,
+            totalPage,
+          },
         },
         message: 'success',
         error: 0,
