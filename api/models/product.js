@@ -6,7 +6,7 @@ const schema = new mongoose.Schema({
     type: String,
     require: true,
   },
-
+  sku: String,
   type: {
     type: String,
     require: true,
@@ -23,7 +23,6 @@ const schema = new mongoose.Schema({
     type: String,
     require: true,
   },
-
   createdAt: {
     type: Number,
     default: Date.now,

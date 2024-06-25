@@ -1,3 +1,4 @@
+const upload = require('../middlewares/upload')
 const db = require('../models/post')
 const router = require('express').Router()
 const uuid = require('uuid').v4
@@ -74,53 +75,76 @@ router.get('/:id', (req, res) => {
 
 //add
 router.post('/', (req, res) => {
-  const newDb = new db({
-    id: uuid,
-    createdAt: Date.now(),
-    ...req.body,
-  })
-
-  newDb
-    .save()
-    .then((data) => {
-      res.status(200).json({
-        data,
-        message: 'add new success',
-        error: 0,
-      })
-    })
-    .catch((error) => {
-      res.status(500).json({
+  upload.single('imageUrl')(req, res, (error) => {
+    if (error) {
+      return res.status(500).json({
         message: `${error}`,
         error: 1,
       })
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: 'No file uploaded.',
+        error: 1,
+      })
+    }
+
+    const newDb = new db({
+      ...req.body,
+      id: uuid(),
+      imageUrl: req.file.path,
+      createdAt: Date.now(),
     })
+
+    newDb
+      .save()
+      .then((data) => {
+        res.status(201).json({
+          error: 0,
+          message: `success`,
+        })
+      })
+      .catch((error) => {
+        res.status(500).json({
+          error: 1,
+          message: `${error}`,
+        })
+      })
+  })
 })
 
 //edit
 router.put('/:id', (req, res) => {
-  db.findOneAndUpdate(
-    { id: req.params.id },
-    {
-      $set: {
-        updatedAt: Date.now(),
-        ...req.body,
-      },
-    },
-  )
-    .then((data) => {
-      res.status(200).json({
-        data,
-        message: 'edit success',
-        error: 0,
-      })
-    })
-    .catch((error) => {
-      res.status(500).json({
+  upload.single('imageUrl')(req, res, (error) => {
+    if (error) {
+      return res.status(500).json({
         message: `${error}`,
         error: 1,
       })
-    })
+    }
+
+    db.findOneAndUpdate(
+      { id: req.params.id },
+      {
+        ...req.body,
+        imageUrl: req.file ? req.file.path : req.body.imageUrl,
+        updatedAt: Date.now(),
+      },
+    )
+      .then(() => {
+        res.status(200).json({
+          message: 'edit success',
+          error: 0,
+        })
+      })
+      .catch((error) => {
+        res.status(500).json({
+          message: `${error}`,
+          error: 1,
+        })
+      })
+  })
 })
 
 //remove

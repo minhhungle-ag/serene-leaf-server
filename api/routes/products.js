@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const upload = require('../middlewares/upload')
 const db = require('../models/product')
 const uuid = require('uuid').v4
 router.get('/', (req, res) => {
@@ -63,52 +64,85 @@ router.get('/:id', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-  const newDb = new db({
-    ...req.body,
-    id: uuid(),
-    createdAt: Date.now(),
-  })
-
-  newDb
-    .save()
-    .then((data) => {
-      res.status(201).json({
-        error: 0,
-        message: `success`,
-        data,
-      })
-    })
-    .catch((error) => {
-      res.status(500).json({
-        error: 1,
+  upload.single('imageUrl')(req, res, (error) => {
+    if (error) {
+      return res.status(500).json({
         message: `${error}`,
+        error: 1,
       })
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: 'No file uploaded.',
+        error: 1,
+      })
+    }
+
+    const newDb = new db({
+      ...req.body,
+      id: uuid(),
+      imageUrl: req.file.path,
+      createdAt: Date.now(),
     })
+
+    newDb
+      .save()
+      .then((data) => {
+        res.status(201).json({
+          error: 0,
+          message: `success`,
+          data,
+        })
+      })
+      .catch((error) => {
+        res.status(500).json({
+          error: 1,
+          message: `${error}`,
+        })
+      })
+  })
 })
 
 router.put('/:id', (req, res) => {
-  db.findOneAndUpdate(
-    { id: req.params.id },
-    {
-      $set: {
-        ...req.body,
-        updatedAt: Date.now(),
-      },
-    },
-  )
-    .then((data) => {
-      res.status(201).json({
-        error: 0,
-        message: 'success',
-        data,
-      })
-    })
-    .catch((error) => {
-      res.status(500).json({
-        error: 1,
+  const { title, imageUrl, shortDescription, description, author } = req.body
+
+  upload.single('imageUrl')(req, res, (error) => {
+    if (error) {
+      return res.status(500).json({
         message: `${error}`,
+        error: 1,
       })
-    })
+    }
+
+    db.findOneAndUpdate(
+      { id: req.params.id },
+      {
+        $set: {
+          title,
+          shortDescription,
+          description,
+          author,
+          imageUrl: req.file ? req.file.path : imageUrl,
+          updatedAt: Date.now(),
+        },
+      },
+      { new: true },
+    )
+      .then((data) => {
+        res.status(201).json({
+          error: 0,
+          message: 'success',
+          data,
+        })
+      })
+      .catch((error) => {
+        res.status(500).json({
+          error: 1,
+          message: `${error}`,
+        })
+      })
+  })
 })
 
 router.delete('/:id', (req, res) => {
