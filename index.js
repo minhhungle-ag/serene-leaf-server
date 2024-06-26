@@ -10,7 +10,7 @@ const app = express()
 env.config()
 
 mongoose
-  .connect(process.env.MONGOOSE_URI) //'mongodb://localhost:27017'
+  .connect('mongodb://localhost:27017') // process.env.MONGOOSE_URI
   .then(() => console.log('Connected DB'))
   .catch((error) => console.log('error: ', error))
 
@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 app.use('/api/posts', require('./api/routes/post'))
 app.use('/api/products', require('./api/routes/products'))
 app.use('/api/upload', require('./api/routes/upload'))
+app.use('/api/auth', require('./api/routes/auth'))
 
 app.use((req, res, next) => {
   const error = new Error('Not found')

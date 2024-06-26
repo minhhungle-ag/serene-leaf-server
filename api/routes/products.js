@@ -2,13 +2,18 @@ const router = require('express').Router()
 const upload = require('../middlewares/upload')
 const db = require('../models/product')
 const uuid = require('uuid').v4
+
 router.get('/', (req, res) => {
-  const { page, limit, searchKey } = req.query
+  const { page, limit, searchKey, category } = req.query
 
   const filters = {}
 
   if (searchKey) {
     filters.$or = [{ title: { $regex: searchKey, $options: 'i' } }]
+  }
+
+  if (category) {
+    filters.category = category
   }
 
   const currentPage = page || 1
@@ -18,6 +23,7 @@ router.get('/', (req, res) => {
   db.find(filters)
     .skip(skip)
     .limit(currentLimit)
+    .sort({ createdAt: -1 })
     .exec()
     .then(async (data) => {
       const total = await db.countDocuments(filters)
@@ -72,8 +78,8 @@ router.post('/', (req, res) => {
       })
     }
 
-    if (!req.file) {
-      return res.status(400).json({
+    if (!req.file || !res.body.imageUrl) {
+      return res.status(404).json({
         message: 'No file uploaded.',
         error: 1,
       })
@@ -92,7 +98,6 @@ router.post('/', (req, res) => {
         res.status(201).json({
           error: 0,
           message: `success`,
-          data,
         })
       })
       .catch((error) => {
@@ -105,8 +110,6 @@ router.post('/', (req, res) => {
 })
 
 router.put('/:id', (req, res) => {
-  const { title, imageUrl, shortDescription, description, author } = req.body
-
   upload.single('imageUrl')(req, res, (error) => {
     if (error) {
       return res.status(500).json({
@@ -115,21 +118,26 @@ router.put('/:id', (req, res) => {
       })
     }
 
+    if (!req.file || !res.body.imageUrl) {
+      return res.status(404).json({
+        message: 'No file uploaded.',
+        error: 1,
+      })
+    }
+
     db.findOneAndUpdate(
       { id: req.params.id },
       {
-        $set: {
-          title,
-          shortDescription,
-          description,
-          author,
-          imageUrl: req.file ? req.file.path : imageUrl,
-          updatedAt: Date.now(),
-        },
+        ...req.body,
+        imageUrl: req.file ? req.file.path : req.body.imageUrl,
+        updatedAt: Date.now(),
       },
-      { new: true },
     )
       .then((data) => {
+        if (!data) {
+          return res.status(404).json({ message: 'Product not found', error: 1 })
+        }
+
         res.status(201).json({
           error: 0,
           message: 'success',

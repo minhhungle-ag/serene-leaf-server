@@ -5,7 +5,7 @@ const uuid = require('uuid').v4
 
 // get all
 router.get('/', (req, res) => {
-  const { page, limit, searchKey } = req.query
+  const { page, limit, searchKey, order } = req.query
 
   const filters = {}
   if (searchKey)
@@ -14,12 +14,15 @@ router.get('/', (req, res) => {
       { title: { $regex: searchKey, $options: 'i' } },
     ]
 
+  const sortOrder = order === 'desc' ? -1 : 1
+
   const currentPage = page || 1
   const currentLimit = limit || 10
   const skip = (currentPage - 1) * limit
 
   db.find(filters)
     .skip(skip)
+    .sort({ title: parseInt(sortOrder), createdAt: -1 })
     .limit(currentLimit)
     .exec()
     .then(async (data) => {
@@ -53,7 +56,7 @@ router.get('/:id', (req, res) => {
   db.findOne({ id: req.params.id })
     .then((data) => {
       if (!data) {
-        return res.status(400).json({
+        return res.status(404).json({
           message: `Not found`,
           error: 1,
         })
@@ -83,8 +86,8 @@ router.post('/', (req, res) => {
       })
     }
 
-    if (!req.file) {
-      return res.status(400).json({
+    if (!req.file || !res.body.imageUrl) {
+      return res.status(404).json({
         message: 'No file uploaded.',
         error: 1,
       })
@@ -120,6 +123,13 @@ router.put('/:id', (req, res) => {
     if (error) {
       return res.status(500).json({
         message: `${error}`,
+        error: 1,
+      })
+    }
+
+    if (!req.file || !res.body.imageUrl) {
+      return res.status(404).json({
+        message: 'No file uploaded.',
         error: 1,
       })
     }

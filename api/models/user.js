@@ -1,34 +1,38 @@
-const mongoose = require('mongoose')
+const { default: mongoose } = require('mongoose')
 
 const schema = new mongoose.Schema({
   id: String,
-  name: {
+  email: {
     type: String,
     require: true,
   },
-  sku: String,
-  type: String,
-  category: {
+  password: {
     type: String,
     require: true,
   },
-  shortDescription: {
+  phone: {
     type: String,
     require: true,
   },
-  description: {
+  address: String,
+  role: {
     type: String,
     require: true,
   },
-  imageUrl: {
+  fullName: {
     type: String,
     require: true,
   },
-  price: {
-    type: Number,
+  description: String,
+  avatar: {
+    type: String,
     require: true,
   },
-  quantity: {
+  gender: {
+    type: String,
+    require: true,
+  },
+  birthday: {
     type: Number,
     require: true,
   },
@@ -42,4 +46,4 @@ const schema = new mongoose.Schema({
   },
 })
 
-module.exports = mongoose.model('Product', schema)
+module.exports = mongoose.model('Users', schema)
