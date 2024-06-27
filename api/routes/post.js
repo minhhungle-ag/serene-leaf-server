@@ -86,7 +86,7 @@ router.post('/', (req, res) => {
       })
     }
 
-    if (!req.file && !res.body.imageUrl) {
+    if (!req.file && !req.body.imageUrl) {
       return res.status(404).json({
         message: 'No file uploaded.',
         error: 1,
@@ -127,7 +127,7 @@ router.put('/:id', (req, res) => {
       })
     }
 
-    if (!req.file && !res.body.imageUrl) {
+    if (!req.file && !req.body.imageUrl) {
       return res.status(404).json({
         message: 'No file uploaded.',
         error: 1,
