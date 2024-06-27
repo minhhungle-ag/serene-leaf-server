@@ -10,7 +10,7 @@ const app = express()
 env.config()
 
 mongoose
-  .connect('mongodb://localhost:27017') // process.env.MONGOOSE_URI
+  .connect(process.env.MONGOOSE_URI) // 'mongodb://localhost:27017'
   .then(() => console.log('Connected DB'))
   .catch((error) => console.log('error: ', error))
 
