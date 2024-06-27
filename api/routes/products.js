@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
   const filters = {}
 
   if (searchKey) {
-    filters.$or = [{ title: { $regex: searchKey, $options: 'i' } }]
+    filters.$or = [{ name: { $regex: searchKey, $options: 'i' } }]
   }
 
   if (category) {
