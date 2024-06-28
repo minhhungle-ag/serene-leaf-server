@@ -88,7 +88,7 @@ router.post('/', (req, res) => {
     const newDb = new db({
       ...req.body,
       id: uuid(),
-      imageUrl: req.file.path,
+      imageUrl: req.file ? req.file.path : req.body.imageUrl,
       createdAt: Date.now(),
     })
 
