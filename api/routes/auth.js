@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const uuid = require('uuid').v4
 const db = require('../models/user')
-
+const upload = require('../middlewares/upload')
 const router = express.Router()
 
 //SIGN UP
