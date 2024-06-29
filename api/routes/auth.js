@@ -7,17 +7,17 @@ const upload = require('../middlewares/upload')
 const router = express.Router()
 
 //SIGN UP
-router.post('/sign-up', async (req, res) => {
-  const { email, password } = req.body
-  const checkUser = await db.findOne({ email })
+router.post('/sign-up', (req, res) => {
+  upload.single('imageUrl')(req, res, async (error) => {
+    const { email, password } = req.body
+    const checkUser = await db.findOne({ email })
 
-  if (checkUser) {
-    return res.status(409).json({
-      message: 'Mail exits',
-    })
-  }
+    if (checkUser) {
+      return res.status(409).json({
+        message: 'Mail exits',
+      })
+    }
 
-  upload.single('imageUrl')(req, res, (error) => {
     if (error) {
       return res.status(500).json({
         message: `${error}`,
@@ -32,38 +32,38 @@ router.post('/sign-up', async (req, res) => {
       })
     }
 
-    bcrypt
-      .hash(password, 10)
-      .then((hash) => {
-        const user = new db({
-          ...req.body,
-          id: uuid(),
-          password: hash,
-          imageUrl: req.file ? req.file.path : req.body.imageUrl,
-          createdAt: new Date(),
-        })
-
-        user
-          .save()
-          .then(() => {
-            res.status(200).json({
-              message: 'success!',
-              error: 0,
-            })
-          })
-          .catch((error) => {
-            res.status(500).json({
-              message: error.message,
-              error: 1,
-            })
-          })
-      })
-      .catch((error) => {
-        res.status(500).json({
+    bcrypt.hash(password, 10, (error, hash) => {
+      if (error) {
+        console.log(error)
+        return res.status(500).json({
           message: error.message,
           error: 1,
         })
+      }
+
+      const user = new db({
+        ...req.body,
+        id: uuid(),
+        password: hash,
+        imageUrl: req.file ? req.file.path : req.body.imageUrl,
+        createdAt: new Date(),
       })
+
+      user
+        .save()
+        .then(() => {
+          res.status(200).json({
+            message: 'success!',
+            error: 0,
+          })
+        })
+        .catch((error) => {
+          res.status(500).json({
+            message: error.message,
+            error: 1,
+          })
+        })
+    })
   })
 })
 
@@ -117,7 +117,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.get('/users', (req, res) => {
-  const { page, limit, searchKey, category } = req.query
+  const { page, limit, searchKey, role } = req.query
 
   const filters = {}
 
@@ -126,6 +126,10 @@ router.get('/users', (req, res) => {
       { email: { $regex: searchKey, $options: 'i' } },
       { fullName: { $regex: searchKey, $options: 'i' } },
     ]
+  }
+
+  if (role) {
+    filters.role = role
   }
 
   const currentPage = page || 1
