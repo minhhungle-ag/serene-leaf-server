@@ -1,11 +1,12 @@
 const express = require('express')
+const db = require('../models/subscribe')
 
 const router = express.Router()
 
 router.post('/', async (req, res) => {
-  const subscribeList = await Subscribe.find({ email: req.body.email })
+  const checkSubscribe = await db.find({ email: req.body.email })
 
-  if (subscribeList) {
+  if (checkSubscribe?.length > 0) {
     return res.status(400).json({
       message: 'Email already exists',
       error: 1,
@@ -14,7 +15,7 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const subscribe = new Subscribe({
+    const subscribe = new db({
       ...req.body,
       createdAt: Date.now(),
     })
