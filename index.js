@@ -37,6 +37,7 @@ app.use('/api/posts', require('./api/routes/post'))
 app.use('/api/products', require('./api/routes/products'))
 app.use('/api/upload', require('./api/routes/upload'))
 app.use('/api/auth', require('./api/routes/auth'))
+app.use('/api/subscribe', require('./api/routes/subscribe'))
 
 app.use((req, res, next) => {
   const error = new Error('Not found')
