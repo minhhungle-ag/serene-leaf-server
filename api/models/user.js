@@ -24,7 +24,7 @@ const schema = new mongoose.Schema({
     require: true,
   },
   description: String,
-  avatar: {
+  imageUrl: {
     type: String,
     require: true,
   },
