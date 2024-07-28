@@ -4,14 +4,14 @@ const db = require('../models/product')
 const uuid = require('uuid').v4
 
 router.get('/', (req, res) => {
-  const { page, limit, searchKey, category } = req.query
+  const { page, limit, searchKey, category, priceFrom, priceTo } = req.query
 
   const filters = {}
 
   if (searchKey) {
     filters.$or = [{ name: { $regex: searchKey, $options: 'i' } }]
   }
-
+  if (priceFrom && priceTo) filters.price = { $gte: priceFrom, $lte: priceTo }
   if (category) {
     filters.category = category
   }
