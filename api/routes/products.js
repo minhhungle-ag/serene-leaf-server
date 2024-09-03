@@ -3,6 +3,39 @@ const upload = require('../middlewares/upload')
 const db = require('../models/product')
 const uuid = require('uuid').v4
 
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Retrieve a list of products
+ *     responses:
+ *       200:
+ *         description: A list of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string *
+ *                   title:
+ *                     type: string
+ *                   author:
+ *                     type: string
+ *                   imageUrl:
+ *                     type: string
+ *                   shortDescription:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   createdAt:
+ *                     type: date
+ *                   updatedAt:
+ *                     type: date
+ */
+
 router.get('/', (req, res) => {
   const { page, limit, searchKey, category, priceFrom, priceTo } = req.query
 

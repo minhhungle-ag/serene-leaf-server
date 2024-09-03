@@ -5,8 +5,11 @@ const bodyParser = require('body-parser')
 
 const { default: mongoose } = require('mongoose')
 const { default: helmet } = require('helmet')
+const swaggerSetup = require('./swagger')
 
 const app = express()
+
+swaggerSetup(app)
 env.config()
 
 mongoose
@@ -38,7 +41,7 @@ app.use('/api/products', require('./api/routes/products'))
 app.use('/api/upload', require('./api/routes/upload'))
 app.use('/api/auth', require('./api/routes/auth'))
 app.use('/api/subscribe', require('./api/routes/subscribe'))
-app.use("/api/add-to-cart", require("./api/routes/cart"))
+app.use('/api/add-to-cart', require('./api/routes/cart'))
 
 app.use((req, res, next) => {
   const error = new Error('Not found')
@@ -54,5 +57,5 @@ app.use((error, req, res, next) => {
   })
 })
 
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 3000
 app.listen(port, () => console.log(`Server started at: ${port}`))
